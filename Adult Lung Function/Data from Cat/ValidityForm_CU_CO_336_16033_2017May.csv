@@ -1,0 +1,5 @@
+number,file,lascar,SN,co_corr,mstudyid,cstudyid,datetime,cf,duration_valid,cf_valid,co_valid_init,NEW_CF,CO_VALID,NOTES,Validated.by
+1,CU_CO_336_BM0931M_19JAN17_R1.txt,CU_CO_336,16033,0,BM0931M,NA,1/17/2017 10:10,0.691,3,1,2,,3,no data,CO
+2,CU_CO_336_BM0229M_23JAN17_R1.txt,CU_CO_336,16033,0,BM0229M,NA,1/20/2017 7:40,0.691,1,1,2,,2,>36 hrs flatline,CO
+3,CU_CO_336_BM1514M_2FEB17_R1.txt,CU_CO_336,16033,0,BM1514M,NA,1/31/2017 7:48,0.691,1,1,2,,2,>36 hrs flatline,CO
+4,CU_CO_336_BM0860M_08FEB17_R1.txt,CU_CO_336,16033,0,BM0860M,NA,2/6/2017 8:18,0.691,1,1,2,,2,>36 hrs flatline,CO

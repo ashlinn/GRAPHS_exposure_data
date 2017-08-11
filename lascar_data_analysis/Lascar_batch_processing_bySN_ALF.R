@@ -424,45 +424,48 @@ for (i in 1:length(savedfiles)){ #
 # ## Add validation data in to CO_parameters --------
 # ## The forms reviewed in the Jan 2015 folder do not have correct CFs so just merge the visual CO validity data:  co_valid, NOTES_NOTES_NOTES, and Validated.by columns
 # 
+
+# load parameters
+CO_parameters <- readRDS("/Users/quinnak/GRAPHS_exposure_data/Adult Lung Function/CO_parameters_501sessions_2017May02.rds")
+
 # # load and merge CO validition forms 
-# validforms <- list.files("~/Dropbox/Ghana_exposure_data_SHARED (1)/CO_files_processed/2016May09/Validation Forms Completed 2016May09/", full.names = TRUE)
-# length(validforms) # 124
+validforms <- list.files("~/GRAPHS_exposure_data/Adult Lung Function/Data from Cat", full.names = TRUE)
+length(validforms) # 73
 # 
-# import.list <- llply(validforms, read.csv, stringsAsFactors = FALSE) # warnings about "incomplete final lines" are ok?
-# CO_validation <- Reduce(function(x, y) merge(x, y, all=T), import.list, accumulate=F)
+import.list <- llply(validforms, read.csv, stringsAsFactors = FALSE) # warnings about "incomplete final lines" are ok?
+CO_validation <- Reduce(function(x, y) merge(x, y, all=T), import.list, accumulate=F)
 # 
 # # check row length
-# rows <- 0
-# for (i in 1:length(import.list)) { 
-#   a <- nrow(import.list[[i]])
-#   rows <- sum(rows, a)
-#   rows
-# }
-# rows # 539
+rows <- 0
+for (i in 1:length(import.list)) {
+  a <- nrow(import.list[[i]])
+  rows <- sum(rows, a)
+  rows
+}
+rows # 501
 # 
-# unique(CO_validation$CO_VALID) # check that only contains 1,2,3, and NA. If not, go back to forms and fix!
+unique(CO_validation$CO_VALID) # check that only contains 1,2,3, and NA. If not, go back to forms and fix!
 # 
 # # # merge by "file" in validation files (need to create similar variable in CO_parameters)
-# # CO_parameters$file_all <- CO_parameters$file
-# # CO_parameters$file <- basename(CO_parameters$file)
+CO_parameters$file_all <- CO_parameters$file
+CO_parameters$file <- basename(CO_parameters$file)
 # CO_parameters <- readRDS("/Users/ashlinn/Dropbox/Ghana_exposure_data_SHARED (1)/CO_files_processed/CO_parameters_539sessions_2016May09.rds")
 # 
 # # make a unique id to match both data frames
-# CO_parameters$year <- year(CO_parameters$firstdate)
-# CO_parameters$month <- month(CO_parameters$firstdate)
-# CO_parameters$day <- day(CO_parameters$firstdate)
-# CO_parameters$newid <- paste(CO_parameters$lascar, CO_parameters$sn, CO_parameters$mstudyid, CO_parameters$year, CO_parameters$month, CO_parameters$day, sep = "_")
+CO_parameters$year <- year(CO_parameters$firstdate)
+CO_parameters$month <- month(CO_parameters$firstdate)
+CO_parameters$day <- day(CO_parameters$firstdate)
+CO_parameters$newid <- paste(CO_parameters$lascar, CO_parameters$sn, CO_parameters$mstudyid, CO_parameters$year, CO_parameters$month, CO_parameters$day, sep = "_")
 # 
 # 
-# CO_validation$year <- year(mdy_hm(CO_validation$datetime, tz = "GMT"))
-# CO_validation$year <- ifelse(as.numeric(CO_validation$year < 2000), CO_validation$year + 2000, CO_validation$year)
-# CO_validation$month <- month(mdy_hm(CO_validation$datetime, tz = "GMT"))
-# CO_validation$day <- day(mdy_hm(CO_validation$datetime, tz = "GMT"))
-# CO_validation$newid <- paste(CO_validation$lascar, CO_validation$SN, CO_validation$mstudyid, CO_validation$year, CO_validation$month, CO_validation$day, sep = "_")
+CO_validation$year <- year(mdy_hm(CO_validation$datetime, tz = "GMT"))
+CO_validation$month <- month(mdy_hm(CO_validation$datetime, tz = "GMT"))
+CO_validation$day <- day(mdy_hm(CO_validation$datetime, tz = "GMT"))
+CO_validation$newid <- paste(CO_validation$lascar, CO_validation$SN, CO_validation$mstudyid, CO_validation$year, CO_validation$month, CO_validation$day, sep = "_")
 # 
 # # check what's going on with duplicates
-# sum(duplicated(CO_validation$newid)) #0
-# sum(duplicated(CO_parameters$newid)) #14
+sum(duplicated(CO_validation$newid)) #0
+sum(duplicated(CO_parameters$newid)) #0
 # dups <- CO_parameters$newid[duplicated(CO_parameters$newid)]
 # CO_parameters[CO_parameters$newid %in% dups,c("file", "co_mean", "newid")] %>% arrange(newid)
 # 
@@ -475,33 +478,34 @@ for (i in 1:length(savedfiles)){ #
 # former <- CO_parameters[!CO_parameters$newid %in% CO_validation$newid,]
 # summary(former$visually_valid) # only 1-3
 # 
-# new <- CO_parameters[CO_parameters$newid %in% CO_validation$newid,]
+new <- CO_parameters[CO_parameters$newid %in% CO_validation$newid,]
 # 
 # # get rid of "visually_valid", "visual_notes", "validated.by" if they exist
 # new <- subset(new, select = -c(visually_valid, visual_notes, validated.by))
 # 
-# CO_all <- merge(new, CO_validation[,c("newid", "CO_VALID", "NOTES", "Validated.by")], all.x = TRUE, by = "newid")
+CO_all <- merge(new, CO_validation[,c("newid", "CO_VALID", "NOTES", "Validated.by")], all.x = TRUE, by = "newid")
 # 
-# colnames(CO_all) <- tolower(colnames(CO_all))
-# colnames(CO_all)[colnames(CO_all) == "co_valid"] <- "visually_valid"
-# colnames(CO_all)[colnames(CO_all) == "notes_notes_notes"] <- "visual_notes"
+colnames(CO_all) <- tolower(colnames(CO_all))
+colnames(CO_all)[colnames(CO_all) == "co_valid"] <- "visually_valid"
+colnames(CO_all)[colnames(CO_all) == "notes"] <- "visual_notes"
 # 
 # # function to convert blanks to NA 
 # 
-# blank2na <- function(x){ 
-#   z <- gsub("\\s+", "", x)  #make sure it's "" and not " " etc
-#   x[z==""] <- NA 
-#   return(x)
-# }
+blank2na <- function(x){
+  z <- gsub("\\s+", "", x)  #make sure it's "" and not " " etc
+  x[z==""] <- NA
+  return(x)
+}
+
+CO_all$visual_notes <- blank2na(CO_all$visual_notes)
+CO_all$validated.by <- blank2na(CO_all$validated.by)
 # 
-# CO_all$visual_notes <- blank2na(CO_all$visual_notes)
-# CO_all$validated.by <- blank2na(CO_all$validated.by)
-# 
-# table(CO_all$visually_valid, useNA = "always")
+table(CO_all$visually_valid, useNA = "always")
 # 
 # ### Calculate duration validity: 1 if >=44 hours, 2 if between 18 and 44 hours, 3 if < 18 hours -------
-# CO_all$duration_valid <- ifelse(CO_all$co_hours >=44, 1, ifelse(CO_all$co_hours >=18, 2, 3))
-# 
+CO_all$duration_valid <- ifelse(CO_all$co_hours >=44, 1, ifelse(CO_all$co_hours >=18, 2, 3))
+table(CO_all$duration_valid, useNA = "always")# 
+
 # ### Calculate overall validity
 #  ## 1 If cf_conf hi, visual validity =1 , duration =1
 #  ## 2 if cf_conf hi, visual validity =2, duration = 1 or 2
@@ -509,11 +513,14 @@ for (i in 1:length(savedfiles)){ #
 #  ## 3 if cf_conf lo, visual validity =1 or 2, duration =1 or 2
 #  ## 4 if visual validity= 3 or duration = 3 or cf_conf = none
 # 
-# CO_all$overall_valid <- ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid == 1 & CO_all$duration_valid == 1, 1, ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid ==2 & (CO_all$duration_valid == 1 | CO_all$duration_valid == 2), 2, ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid == 1 & CO_all$duration_valid == 2, 2, ifelse(CO_all$co_cf_conf == "lo" & (CO_all$visually_valid == 1 | CO_all$visually_valid == 2) & (CO_all$duration_valid == 1 | CO_all$duration_valid == 2), 3, ifelse(CO_all$visually_valid == 3 | CO_all$duration_valid == 3 | CO_all$co_cf_conf == "none", 4, NA)))))
+CO_all$overall_valid <- ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid == 1 & CO_all$duration_valid == 1, 1, ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid ==2 & (CO_all$duration_valid == 1 | CO_all$duration_valid == 2), 2, ifelse(CO_all$co_cf_conf == "hi" & CO_all$visually_valid == 1 & CO_all$duration_valid == 2, 2, ifelse(CO_all$co_cf_conf == "lo" & (CO_all$visually_valid == 1 | CO_all$visually_valid == 2) & (CO_all$duration_valid == 1 | CO_all$duration_valid == 2), 3, ifelse(CO_all$visually_valid == 3 | CO_all$duration_valid == 3 | CO_all$co_cf_conf == "none", 4, NA)))))
 # 
+
+table(CO_all$overall_valid, useNA = "always")
+
 # # Check forms
-# colSums(is.na(CO_all)) # check for unexpected NAs
-# unique(CO_all[!is.na(CO_all$visually_valid) & is.na(CO_all$validated.by), "lascar"])
+colSums(is.na(CO_all)) # check for unexpected NAs
+unique(CO_all[!is.na(CO_all$visually_valid) & is.na(CO_all$validated.by), "lascar"])
 # 
 # ### Remove files that haven't been validated yet 
 # CO_all <- CO_all[!is.na(CO_all$visually_valid),]
@@ -537,6 +544,7 @@ for (i in 1:length(savedfiles)){ #
 # 
 # ### save
 # saveRDS(CO_merged, file = paste0("CO_parameters_validated_", nrow(CO_merged), "sessions_", format(Sys.Date(), format = "%b%d"), ".rds"))
+saveRDS(CO_all, file = paste0("CO_parameters_validated_", nrow(CO_all), "sessions_", format(Sys.Date(), format = "%b%d"), ".rds"))
 # 
 # 
 # 
@@ -576,56 +584,56 @@ for (i in 1:length(savedfiles)){ #
 # # go back to the top to process unvalidated files so they'll line up with the plots
 
 
-### COMBINE WITH MASTER VALIDATION INFO ####
-CO_parameters <- readRDS("/Users/Adoption/Dropbox/Ghana_exposure_data_SHARED_2014/CO_files_processed/CO_parameters_11898sessions_2016Jun10.rds")
-validation <- readRDS("/Users/Adoption/Dropbox/Ghana_exposure_data_SHARED_2014/CO_files_processed/CO_validation_info_11892sessions_2016Jun05.rds")
-
-#make a unique id to match both data frames
-CO_parameters$newid <- paste(CO_parameters$lascar, CO_parameters$sn, CO_parameters$mstudyid, year(CO_parameters$firstdate), month(CO_parameters$firstdate), day(CO_parameters$firstdate), sep = "_")
-
-CO_withvalidation <- merge(CO_parameters, validation[, 1:7], by = "newid", all.x = TRUE)
-CO_withvalidation <- rename(CO_withvalidation, file_from_parameters = file)
-CO_withvalidation <- rename(CO_withvalidation, file_from_validation = file_all)
-
-# fix a few session typos
-CO_withvalidation$session[CO_withvalidation$session == "s01"] <- "s_01"
-CO_withvalidation$session[CO_withvalidation$session == "s2"] <- "s_02"
-CO_withvalidation$session[CO_withvalidation$session == "s_2"] <- "s_02"
-CO_withvalidation$session[CO_withvalidation$session == "s_0"] <- "s_02"
-CO_withvalidation$session[CO_withvalidation$session == "s_15"] <- "s_01"
-CO_withvalidation$session[basename(CO_withvalidation$file_from_parameters) == "CU_CO_104_BM1546M_22Jun15_s_05_dup.txt"] <- "s_04"
-
-# blank to NA
-blank2na <- function(x){ 
-  z <- gsub("\\s+", "", x)  #make sure it's "" and not " " etc
-  x[z==""] <- NA 
-  return(x)
-}
-
-CO_withvalidation$cstudyid <- blank2na(CO_withvalidation$cstudyid)
-# check sessions
-# mother files
-sessioncheck <- data.frame(table(CO_withvalidation$mstudyid[is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[is.na(CO_withvalidation$cstudyid)]))
-max(sessioncheck$Freq) # 2
-
-# child files
-sessioncheck2 <- data.frame(table(CO_withvalidation$cstudyid[!is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid)]))
-max(sessioncheck2$Freq) # 2
-
-colSums(table(CO_withvalidation$cstudyid[!is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid)])) # 11 child sessions are s_05, 8 are s_06, and 5 are s_07.
-
-CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid) & CO_withvalidation$session == "s_05"] <- "s_01"
-CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid) & CO_withvalidation$session == "s_06"] <- "s_02"
-
-
-# add "newsession" with M or C prefix for mother or child
-CO_withvalidation$newsession <- ifelse(!is.na(CO_withvalidation$cstudyid), paste("C", substr(CO_withvalidation$session, 3, 4), sep = "_"), paste("M", substr(CO_withvalidation$session, 3,4), sep = "_"))
-
-
-### SAVE DATA WITH VALIDATION ####
-
-saveRDS(CO_withvalidation, file =  paste0("FINAL_CO_parameters_withvalidation_", format(Sys.Date(), format = "%Y%b%d"), ".rds" ))
-write.csv(CO_withvalidation, file =  paste0("FINAL_CO_parameters_withvalidation_", format(Sys.Date(), format = "%Y%b%d"), ".csv" ), row.names = FALSE)
+# ### COMBINE WITH MASTER VALIDATION INFO ####
+# CO_parameters <- readRDS("/Users/Adoption/Dropbox/Ghana_exposure_data_SHARED_2014/CO_files_processed/CO_parameters_11898sessions_2016Jun10.rds")
+# validation <- readRDS("/Users/Adoption/Dropbox/Ghana_exposure_data_SHARED_2014/CO_files_processed/CO_validation_info_11892sessions_2016Jun05.rds")
+# 
+# #make a unique id to match both data frames
+# CO_parameters$newid <- paste(CO_parameters$lascar, CO_parameters$sn, CO_parameters$mstudyid, year(CO_parameters$firstdate), month(CO_parameters$firstdate), day(CO_parameters$firstdate), sep = "_")
+# 
+# CO_withvalidation <- merge(CO_parameters, validation[, 1:7], by = "newid", all.x = TRUE)
+# CO_withvalidation <- rename(CO_withvalidation, file_from_parameters = file)
+# CO_withvalidation <- rename(CO_withvalidation, file_from_validation = file_all)
+# 
+# # fix a few session typos
+# CO_withvalidation$session[CO_withvalidation$session == "s01"] <- "s_01"
+# CO_withvalidation$session[CO_withvalidation$session == "s2"] <- "s_02"
+# CO_withvalidation$session[CO_withvalidation$session == "s_2"] <- "s_02"
+# CO_withvalidation$session[CO_withvalidation$session == "s_0"] <- "s_02"
+# CO_withvalidation$session[CO_withvalidation$session == "s_15"] <- "s_01"
+# CO_withvalidation$session[basename(CO_withvalidation$file_from_parameters) == "CU_CO_104_BM1546M_22Jun15_s_05_dup.txt"] <- "s_04"
+# 
+# # blank to NA
+# blank2na <- function(x){ 
+#   z <- gsub("\\s+", "", x)  #make sure it's "" and not " " etc
+#   x[z==""] <- NA 
+#   return(x)
+# }
+# 
+# CO_withvalidation$cstudyid <- blank2na(CO_withvalidation$cstudyid)
+# # check sessions
+# # mother files
+# sessioncheck <- data.frame(table(CO_withvalidation$mstudyid[is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[is.na(CO_withvalidation$cstudyid)]))
+# max(sessioncheck$Freq) # 2
+# 
+# # child files
+# sessioncheck2 <- data.frame(table(CO_withvalidation$cstudyid[!is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid)]))
+# max(sessioncheck2$Freq) # 2
+# 
+# colSums(table(CO_withvalidation$cstudyid[!is.na(CO_withvalidation$cstudyid)], CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid)])) # 11 child sessions are s_05, 8 are s_06, and 5 are s_07.
+# 
+# CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid) & CO_withvalidation$session == "s_05"] <- "s_01"
+# CO_withvalidation$session[!is.na(CO_withvalidation$cstudyid) & CO_withvalidation$session == "s_06"] <- "s_02"
+# 
+# 
+# # add "newsession" with M or C prefix for mother or child
+# CO_withvalidation$newsession <- ifelse(!is.na(CO_withvalidation$cstudyid), paste("C", substr(CO_withvalidation$session, 3, 4), sep = "_"), paste("M", substr(CO_withvalidation$session, 3,4), sep = "_"))
+# 
+# 
+# ### SAVE DATA WITH VALIDATION ####
+# 
+# saveRDS(CO_withvalidation, file =  paste0("FINAL_CO_parameters_withvalidation_", format(Sys.Date(), format = "%Y%b%d"), ".rds" ))
+# write.csv(CO_withvalidation, file =  paste0("FINAL_CO_parameters_withvalidation_", format(Sys.Date(), format = "%Y%b%d"), ".csv" ), row.names = FALSE)
 
 ###############Other stuff for review purposes, not necessary ######
 

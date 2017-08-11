@@ -1,0 +1,4 @@
+number,file,lascar,SN,co_corr,mstudyid,cstudyid,datetime,cf,duration_valid,cf_valid,co_valid_init,NEW_CF,CO_VALID,NOTES,Validated.by
+1,CU_CO_348_BM0388M_27OCT16_R1.txt,CU_CO_348,15943,0,BM0388M,NA,10/25/2016 7:25,0.768,1,1,1,,1,,CO
+2,CU_CO_348_BM1029M_07NOV16_R1.txt,CU_CO_348,15943,0,BM1029M,NA,11/4/2016 9:51,0.768,1,1,2,,3,"large ""ski slope""",CO
+3,CU_CO_348_BM0685M_28NOV16_R1.txt,CU_CO_348,15943,0,BM0685M,NA,11/25/2016 10:49,0.768,1,1,1,,1,,CO

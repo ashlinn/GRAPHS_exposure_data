@@ -1,0 +1,4 @@
+number,file,lascar,SN,co_corr,mstudyid,cstudyid,datetime,cf,duration_valid,cf_valid,co_valid_init,NEW_CF,CO_VALID,NOTES,Validated.by
+1,CU_CO_290_BM1544M_03FEB17_R1.txt,CU_CO_290,15892,0,BM1544M,NA,2/1/2017 8:42,0.801,1,1,1,,1,,CO
+2,CU_CO_290_BM1097M_08FEB17_R1.txt,CU_CO_290,15892,0,BM1097M,NA,2/6/2017 8:49,0.801,1,1,1,,1,,CO
+3,CU_CO_290_BM1273M_13FEB17_R1.txt,CU_CO_290,15892,0,BM1273M,NA,2/10/2017 8:16,0.801,1,1,1,,1,,CO

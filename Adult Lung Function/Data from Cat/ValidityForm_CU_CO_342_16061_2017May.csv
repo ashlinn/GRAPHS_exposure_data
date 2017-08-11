@@ -1,0 +1,3 @@
+number,file,lascar,SN,co_corr,mstudyid,cstudyid,datetime,cf,duration_valid,cf_valid,co_valid_init,NEW_CF,CO_VALID,NOTES,Validated.by
+1,CU_CO_342_BM0406M_08DEC16_R1.txt,CU_CO_342,16061,0,BM0406M,NA,12/6/2016 7:52,0.728,1,1,1,,2,>36 hrs flatline,CO
+2,CU_CO_342_BM0538M_15DEC16_R1.txt,CU_CO_342,16061,0,BM0538M,NA,12/13/2016 6:58,0.728,3,1,1,,2,slightly elevated baseline,CO
